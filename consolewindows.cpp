@@ -105,7 +105,7 @@ void ConsoleWindows::Initialization_Widgets()
     m_position_WScanPackage = ui->stackedWidget->addWidget(m_Widget_ScanPackage);
 
    //Widget stowpackages
-    m_Widget_StowPackages = new StowPackages(m_Widget_ScanPackage,m_Widget_BoxChoice,m_Doors);
+    m_Widget_StowPackages = new StowPackages(m_Widget_ScanPackage,m_Widget_BoxChoice,m_BD,m_Doors);
     m_position_WStowPackages = ui->stackedWidget->addWidget(m_Widget_StowPackages);
 
    //Widget confirmation de la livraison
@@ -116,6 +116,14 @@ void ConsoleWindows::Initialization_Widgets()
    //Widget Setting
     m_Widget_Setting = new Setting();
     m_position_WSetting = ui->stackedWidget->addWidget(m_Widget_Setting);
+
+   //Widget MaintenanceMenu
+    m_Widget_MaintenanceMenu = new MaintenanceMenu();
+    m_position_WMaintenanceMenu = ui->stackedWidget->addWidget(m_Widget_MaintenanceMenu);
+
+   //Widget SQLite_Local_DatabaseManager
+    m_Widget_SQLite_Local_DatabaseManager = new SQLite_Local_DatabaseManager(m_Widget_Setting,m_BD);
+    m_position_WSQLite_Local_DatabaseManager = ui->stackedWidget->addWidget(m_Widget_SQLite_Local_DatabaseManager);
 
 }
 void ConsoleWindows::Init_Show_Widgets()
@@ -134,6 +142,8 @@ void ConsoleWindows::Init_Show_Widgets()
     m_WidgetsShow.SetPosShowPackageBox(m_position_WShowPackageBox);
     m_WidgetsShow.SetPosStowPackages(m_position_WStowPackages);
     m_WidgetsShow.SetStackedWidget(ui->stackedWidget);
+    m_WidgetsShow.SetPosMaintenanceMenu(m_position_WMaintenanceMenu);
+    m_WidgetsShow.SetPosSQLite_Local_DatabaseManager(m_position_WSQLite_Local_DatabaseManager);
 
 
     //Widget Customer
@@ -168,6 +178,10 @@ void ConsoleWindows::Init_Show_Widgets()
 
    //Widget Setting
     m_Widget_Setting->SetShowWidgets(&m_WidgetsShow);
+
+   //Widget Maintenance
+    m_Widget_MaintenanceMenu->SetShowWidgets(&m_WidgetsShow);
+    m_Widget_SQLite_Local_DatabaseManager->SetShowWidgets(&m_WidgetsShow);
 
 
 }

@@ -28,4 +28,7 @@
         <file alias="Setting">Images/settings.png</file>
         <file alias="Attention">Images/Attention.png</file>
     </qresource>
+    <qresource prefix="/Bulle">
+        <file alias="bullebottomleft">Images/bulle.png</file>
+    </qresource>
 </RCC>

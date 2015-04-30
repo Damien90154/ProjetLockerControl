@@ -11,9 +11,9 @@
 #include <QDebug>
 #include <QDateTime>
 
-CSQLite_Local_DB::CSQLite_Local_DB()
+CSQLite_Local_DB::CSQLite_Local_DB() : QObject()
 {
-    this->m_DatabaseName = "LockerControlDatabase.sqlite";
+    this->m_DatabaseName = "LC_SQL_files/LockerControlDatabase.sqlite";
     this->m_SQL_File_DatabaseEmpty_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseEmpty.sql";
     this->m_SQL_File_DatabaseDefault_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseDefault.sql";
     this->m_SQL_File_DatabaseLastSave_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseLastSave.sql";
@@ -31,6 +31,7 @@ CSQLite_Local_DB::CSQLite_Local_DB()
 CSQLite_Local_DB::~CSQLite_Local_DB()
 {
     // Close database
+    this->m_DataBaseIsReady = false;
     this->m_DataBase.close();
 }
 
@@ -493,7 +494,7 @@ QList<QString> CSQLite_Local_DB::ReadSQL_File(QString FilePath)
              QueryList.append(RdyQuery);
              qDebug()<<"Ready query : "<<RdyQuery;
              RdyQuery.clear();
-             temp.clear();
+             temp = " ";
          }
          SQL_File.close();
     }
@@ -529,6 +530,7 @@ bool CSQLite_Local_DB::SQL_Database_Manager(int Option)
     QSqlQuery query(this->m_DataBase);
     QList<QString> QueryList;
 
+    emit SQL_Database_Manager_Status("Démarrage de SQL_Database_Manager ...",1);
     switch(Option)
     {
         case EMPTY_DATABASE:
@@ -557,6 +559,7 @@ bool CSQLite_Local_DB::SQL_Database_Manager(int Option)
         }
         case SAVE_DATABASE:
         {
+            emit SQL_Database_Manager_Status("Demarrage de la sauvegarde ...",2);
             if(SaveDatabase(this->m_SQL_File_DatabaseLastSave_Path))
                 Result = true;
             break;
@@ -580,20 +583,43 @@ bool CSQLite_Local_DB::SQL_Database_Manager(int Option)
 bool CSQLite_Local_DB::SaveDatabase(QString FilePath)
 {
     bool Result = false;
-    QList<QString> TablesList = this->m_DataBase.tables();
+    QStringList TablesList;
     QList<QString> EmptyDatabaseQueryList;
     QList<struct struct_Database_Contains> Database_Contains;
     struct struct_Database_Contains Database_Contains_Temp;
     QSqlQuery query(this->m_DataBase);
+    QFile SQL_File(FilePath);
 
+    TablesList = this->m_DataBase.tables();
+    if(TablesList.isEmpty())
+    {
+        TablesList.append("Box");
+        TablesList.append("Console");
+        TablesList.append("DCB_Controler");
+        TablesList.append("DoorLocker");
+        TablesList.append("ExtractCode");
+        TablesList.append("Package");
+        TablesList.append("PerformedActions");
+        TablesList.append("User");
+    }
+
+    emit SQL_Database_Manager_Status("Suppression de l'ancienne sauvegarde ...",3);
+    if(SQL_File.open(QIODevice::WriteOnly)) //delete file
+        qDebug() << "[WARNING] : The last database save : " << FilePath << " is DELETED !";
+    SQL_File.close();
+
+    emit SQL_Database_Manager_Status("Création du fichier de sauvegarde ...",5);
     EmptyDatabaseQueryList = ReadSQL_File(m_SQL_File_DatabaseEmpty_Path);
     for(int i=0; i<EmptyDatabaseQueryList.count(); i++)
     {
         WriteSQL_File(FilePath,EmptyDatabaseQueryList[i]+"\n");
     }
 
+    emit SQL_Database_Manager_Status("Ecriture dans le fichier de sauvegarde ...",7);
     for(int Table=0; Table<TablesList.count(); Table++)
     {
+        emit SQL_Database_Manager_Status("Ecriture dans le fichier de sauvegarde ...",10+(Table*10));
+        qDebug()<< "TablesList :" << TablesList;
         Database_Contains_Temp.Table = TablesList[Table];
         if(query.exec("SELECT * FROM " + TablesList[Table]))
         {
@@ -602,7 +628,7 @@ bool CSQLite_Local_DB::SaveDatabase(QString FilePath)
             {
                 QString QueryValue;
 
-                for(int Col=0; Col<=9; Col++)
+                for(int Col=0; Col<=7; Col++)
                 {
                     if(query.value(Col).toString() != "")
                     {
@@ -619,6 +645,7 @@ bool CSQLite_Local_DB::SaveDatabase(QString FilePath)
         Database_Contains.append(Database_Contains_Temp);
         Database_Contains_Temp.Values.clear();
         Result = true;
+        emit SQL_Database_Manager_Status("Fin de la sauvegarde ...",100);
     }
 
     return Result;
@@ -629,6 +656,26 @@ bool CSQLite_Local_DB::LoadDatabaseSave(QString FilePath)
     bool Result;
     QFile SQL_File(FilePath);
     QList<QString> QueryList;
+    QString Database_Path;
+
+    Database_Path = "rm "+this->m_DatabaseName;
+    this->m_DataBaseIsReady = false;
+    this->m_DataBase.close();
+
+    if(system(Database_Path.toStdString().c_str())) //delete database
+    {
+        qDebug()<< "[WARNING] : The database : " << this->m_DatabaseName << " is DELETED ! a new database is created with the last save ..." ;
+    }
+
+    if(Connect_DB())
+    {
+        this->m_DataBaseIsReady = true;  // Open database : Open
+    }
+    else
+    {
+        this->m_DataBaseIsReady = false; // Open database : Fail
+    }
+
     QSqlQuery query(this->m_DataBase);
 
     if(SQL_File.exists())

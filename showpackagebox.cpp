@@ -116,7 +116,7 @@ void ShowPackageBox::ReturnHome()
    {
       //arrete le thread
       m_T_StatusDoors->stopThread();
-
+      m_T_StatusDoors->wait(1000);
       //verrouillé les portes
       m_CDoors->LockDoors(m_listbox);
 

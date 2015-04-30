@@ -24,6 +24,8 @@ class ShowWidgets
     int m_position_WDeliveryComfirm;
     int m_position_WShowPackageBox;
     int m_position_WStowPackages;
+    int m_position_WMaintenanceMenu;
+    int m_position_WSQLite_Local_DatabaseManager;
 
   public:
     ShowWidgets();
@@ -41,6 +43,9 @@ class ShowWidgets
     int GetPosShowPackageBox(){return m_position_WShowPackageBox;}
     int GetPosSetting(){return m_position_WSetting;}
     int GetPosStowPackages(){return m_position_WStowPackages;}
+    int GetPosMaintenanceMenu(){return m_position_WMaintenanceMenu;}
+    int GetPosSQLite_Local_DatabaseManager(){return m_position_WSQLite_Local_DatabaseManager;}
+
     template <typename T> T* GetWidget(int pos){
         return (T*)m_StackedWidget->widget(pos);
     }
@@ -58,6 +63,8 @@ class ShowWidgets
     void SetPosShowPackageBox(int TposShowPackageBox){m_position_WShowPackageBox = TposShowPackageBox;}
     void SetPosSetting(int TposSetting){m_position_WSetting = TposSetting;}
     void SetPosStowPackages(int TposStowPackage){m_position_WStowPackages = TposStowPackage;}
+    void SetPosMaintenanceMenu(int TposMaintenanceMenu){m_position_WMaintenanceMenu = TposMaintenanceMenu;}
+    void SetPosSQLite_Local_DatabaseManager(int TposSQLite_Local_DatabaseManager) {m_position_WSQLite_Local_DatabaseManager = TposSQLite_Local_DatabaseManager;}
 
     //show Widgets
     void ShowWConsoleWindows();
@@ -71,6 +78,8 @@ class ShowWidgets
     void ShowWPackageBox();
     void ShowWSetting();
     void ShowWStowPackages();
+    void ShowWMaintenanceMenu();
+    void ShowWSQLite_Local_DatabaseManager();
 
 
 };

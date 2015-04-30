@@ -20,6 +20,7 @@ public:
     void retranslateUi();
 public slots:
     void ReturnHome();
+    void ShowMaintenanceMenu();
 
 private:
     Ui::Setting *ui;

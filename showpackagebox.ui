@@ -270,7 +270,8 @@ QToolButton:pressed{
 }
 
 QToolTip{
-	position:right-center;
+	
+	border-image: url(:/Bulle/bullebottomleft);
 	border:1px white;	
 	border-radius:0px;
     min-width:450;
@@ -278,8 +279,8 @@ QToolTip{
 	font : 15pt;
 	min-height:150;
 	max-height:150;
-	background-color: rgb(114, 114, 114);
-	color: rgb(255, 255, 255);
+	
+		color: rgb(255, 255, 255);
 	    	
 }
 

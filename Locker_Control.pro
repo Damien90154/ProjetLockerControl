@@ -36,7 +36,10 @@ SOURCES += main.cpp\
     thread_statusdoors.cpp \
     customtreewidget.cpp \
     keyboard.cpp \
-    country.cpp
+    country.cpp \
+    maintenancemenu.cpp \
+    sqlite_local_databasemanager.cpp \
+    thread_databasemanager.cpp
 
 HEADERS  += \
     boxchoice.h \
@@ -62,7 +65,10 @@ HEADERS  += \
     thread_statusdoors.h \
     customtreewidget.h \
     keyboard.h \
-    country.h
+    country.h \
+    maintenancemenu.h \
+    sqlite_local_databasemanager.h \
+    thread_databasemanager.h
 
 FORMS    += \
     boxchoice.ui \
@@ -76,7 +82,9 @@ FORMS    += \
     stowpackages.ui \
     showpackagebox.ui \
     consolewindows.ui \
-    keyboard.ui
+    keyboard.ui \
+    maintenancemenu.ui \
+    sqlite_local_databasemanager.ui
 
 RESOURCES += \
     Src.qrc

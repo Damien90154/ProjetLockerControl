@@ -322,7 +322,7 @@ QToolButton:pressed{
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>3</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="P_StowPackage">
         <layout class="QGridLayout" name="gridLayout_2">
@@ -895,7 +895,7 @@ QPushButton:pressed{
             <number>5</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="label_selectionbox">
              <property name="font">
               <font>
                <pointsize>15</pointsize>

@@ -80,3 +80,13 @@ void ShowWidgets::ShowWStowPackages()
 {
     m_StackedWidget->setCurrentIndex(m_position_WStowPackages);
 }
+
+void ShowWidgets::ShowWMaintenanceMenu()
+{
+    m_StackedWidget->setCurrentIndex(m_position_WMaintenanceMenu);
+}
+
+void ShowWidgets::ShowWSQLite_Local_DatabaseManager()
+{
+    m_StackedWidget->setCurrentIndex(m_position_WSQLite_Local_DatabaseManager);
+}

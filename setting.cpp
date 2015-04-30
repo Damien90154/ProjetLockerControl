@@ -7,13 +7,19 @@ Setting::Setting(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->B_Home,SIGNAL(clicked()),this,SLOT(ReturnHome()));
-
+    connect(ui->B_Maintenance,SIGNAL(clicked()),this,SLOT(ShowMaintenanceMenu()));
 }
 
 Setting::~Setting()
 {
     delete ui;
 }
+
+void Setting::ShowMaintenanceMenu()
+{
+    m_ShowWidgets->ShowWMaintenanceMenu();
+}
+
 
 void Setting::ReturnHome()
 {

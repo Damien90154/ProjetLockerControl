@@ -52,5 +52,4 @@ void Thread_StatusDoors::run()
         }
     }
 
-    exit(0);
 }

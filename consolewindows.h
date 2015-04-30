@@ -20,6 +20,8 @@
 #include "stowpackages.h"
 #include "clms_db.h"
 #include "csqlite_local_db.h"
+#include "maintenancemenu.h"
+#include "sqlite_local_databasemanager.h"
 
 class ConsoleWindows;
 
@@ -77,6 +79,8 @@ private:
     int m_position_WDeliveryComfirm;
     int m_position_WShowPackageBox;
     int m_position_WStowPackages;
+    int m_position_WMaintenanceMenu;
+    int m_position_WSQLite_Local_DatabaseManager;
 
     ShowWidgets m_WidgetsShow;
 
@@ -96,7 +100,8 @@ private:
     Setting *m_Widget_Setting;
 
  //Maintenance
-
+    MaintenanceMenu *m_Widget_MaintenanceMenu;
+    SQLite_Local_DatabaseManager *m_Widget_SQLite_Local_DatabaseManager;
  //Login
     Login *m_Widget_Login;
 

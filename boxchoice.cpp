@@ -165,16 +165,14 @@ void BoxChoice::manageDoorUnvailable(int id)
 {
     switch (m_ListBox[id].status)
     {
-        case  OK :
-            m_ListBox[id].status = KO;
-            break;
 
         case  KO:
-            m_ListBox[id].status = OK;
-            break;
+                 m_ListBox[id].status = OK;
+                 break;
 
         default :
-                     break;
+                 m_ListBox[id].status = KO;
+                 break;
     }
     m_listdrawBox[id]->setColor(m_ListBox[id].status);
 

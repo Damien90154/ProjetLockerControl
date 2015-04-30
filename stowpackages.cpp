@@ -4,7 +4,7 @@
 #include <QToolTip>
 #include <QDebug>
 
-StowPackages::StowPackages(ScanPackage *WScanPackage, BoxChoice *WBoxChoice,CDoors *doors ,QWidget *parent) :
+StowPackages::StowPackages(ScanPackage *WScanPackage, BoxChoice *WBoxChoice,CSQLite_Local_DB *DB,CDoors *doors ,QWidget *parent) :
     QWidget(parent),
     ui(new Ui::StowPackages)
 {
@@ -12,6 +12,7 @@ StowPackages::StowPackages(ScanPackage *WScanPackage, BoxChoice *WBoxChoice,CDoo
     m_WScanPackage = WScanPackage;
     m_WBoxChoice = WBoxChoice;
     m_CDoors = doors;
+    m_BD = DB;
     m_CustomTreeWidget = new CustomTreeWidget(ui->treeWidget);
 
     m_Scene = m_WBoxChoice->GetScene();
@@ -50,6 +51,25 @@ void StowPackages::ShowPageChangeBoxChecked()
 }
 void StowPackages::ShowPageChangeBoxDefChecked()
 {
+    //remise a l'état initiale
+    //mettre les portes qui etait non dsponible
+    for(int i=0;i < m_listBoxdeftmp.size();i++)
+    {
+        m_WBoxChoice->manageDoorUnvailable((m_listBoxdeftmp[i]-1));
+    }
+
+    //mettre les portes qui ont un defaut en non disponible
+    for(int i=0;i < m_listBoxdeftmp.size();i++)
+    {
+        m_WBoxChoice->manageRect((m_listBoxdeftmp[i]-1));
+    }
+
+    //déselectionne les portes qui sont selectionne
+    for(int i=0;i < m_listBoxtmp.size();i++)
+    {
+        m_WBoxChoice->manageRect((m_listBoxtmp[i]-1));
+    }
+
     ui->stackedWidget->setCurrentWidget(ui->P_CheckBoxDef);
 }
 
@@ -138,84 +158,90 @@ void StowPackages::ValidCheckedbox()
 
 
     //si listbox empty message alerte
-
-    for(int i=0;i<m_listBox.size();i++)
+    if(!m_listBox.isEmpty())
     {
-        //recupere les items
-
-        QListWidgetItem *item;
-        item = new QListWidgetItem(QString("Porte : "+QString::number(m_listBox[i])));
-        item->setCheckState(Qt::Unchecked);
-        listitemtmp << item;
-
-
-    }
-
-    for(int i=0;i<ui->ListBoxes->count();i++)
-    {
-        if(ui->ListBoxes->item(i)->checkState() == Qt::Checked)
+        for(int i=0;i<m_listBox.size();i++)
         {
-            //recupere les items ckecked
-            listitemtmp[i]->setCheckState(Qt::Unchecked);
-            ui->listBOX_checkDef->addItem(listitemtmp[i]);
+            //recupere les items
+
+            QListWidgetItem *item;
+            item = new QListWidgetItem(QString("Porte : "+QString::number(m_listBox[i])));
+            item->setCheckState(Qt::Unchecked);
+            listitemtmp << item;
 
         }
+
+        for(int i=0;i<ui->ListBoxes->count();i++)
+        {
+            if(ui->ListBoxes->item(i)->checkState() == Qt::Checked)
+            {
+                //recupere les items ckecked
+                listitemtmp[i]->setCheckState(Qt::Unchecked);
+                ui->listBOX_checkDef->addItem(listitemtmp[i]);
+
+            }
+        }
+        if(ui->listBOX_checkDef->count() == 0)
+        {
+            qDebug()<<"aucune porte selectionné";
+        }
+        else{
+              ui->stackedWidget->setCurrentWidget(ui->P_CheckBoxDef);
+        }
+   }
+   else{
+
     }
-
-
-    ui->stackedWidget->setCurrentWidget(ui->P_CheckBoxDef);
-
 }
 
 void StowPackages::ValidCheckedboxdef()
 {
-    m_listBoxdeftmp.clear();
-    QList<QListWidgetItem*> listitemtmp;
+
     QList<QListWidgetItem*> listitem;
+
+    m_listBoxdeftmp.clear();
+    m_listBoxtmp.clear();
 
     //si listbox empty message alerte
 
     for(int i=0;i<ui->listBOX_checkDef->count();i++)
     {
         //recupere les items
-        listitemtmp << ui->listBOX_checkDef->item(i);
+         listitem << ui->listBOX_checkDef->item(i);
     }
 
-    for(int i=0;i<listitemtmp.size();i++)
+    for(int i=0;i< listitem.size();i++)
     {
-        if(listitemtmp[i]->checkState() == Qt::Checked)
+        if(listitem[i]->checkState() == Qt::Checked)
         {
-            //recupere les items ckecked
-            listitem << listitemtmp[i];
+            //recupere les numeros des portes ckecked def
+            m_listBoxdeftmp <<  listitem[i]->text().remove("Porte : ").toInt();
         }
         else{
-            m_listBoxtmp<<listitemtmp[i]->text().remove("Porte : ").toInt();
+            //recupere les numeros des portes qui n'ont pas de defaut
+            m_listBoxtmp<< listitem[i]->text().remove("Porte : ").toInt();
         }
     }
 
     //affiche les portes
-
-    for(int i=0;i<listitem.size();i++)
-    {
-        int numbox;
-        numbox = listitem[i]->text().remove("Porte : ").toInt();
-        m_listBoxdeftmp<<numbox;
-        numbox-=1;
-        m_WBoxChoice->manageRect(numbox);
-        m_WBoxChoice->manageDoorUnvailable(numbox);
+    qDebug()<<"ListPortedef:"<<m_listBoxdeftmp;
+    qDebug()<<"ListPortechange"<<m_listBoxtmp;
 
 
-    }
-    for(int i=0;i<m_listBoxtmp.size();i++)
-    {
-        int numbox;
-        qDebug()<<m_listBoxtmp[i];
-        numbox=m_listBoxtmp[i]-1;
-        m_WBoxChoice->manageDoorUnvailable(numbox);
-        m_WBoxChoice->manageRect(numbox);
-
+    //mettre les portes qui ont un defaut en non disponible
+    for(int i=0;i < m_listBoxdeftmp.size();i++)
+    {        
+        m_WBoxChoice->manageDoorUnvailable((m_listBoxdeftmp[i]-1));
     }
 
+    //déselectionne les portes qui sont selectionne
+    for(int i=0;i < m_listBoxtmp.size();i++)
+    {
+        m_WBoxChoice->manageRect((m_listBoxtmp[i]-1));
+    }
+    int nbox;
+    nbox = m_listBoxdeftmp.size() + m_listBoxtmp.size();
+    ui->label_selectionbox->setText(QString(QString(tr("Veuillez sélectionner ")) + QString::number(nbox) + QString(tr(" consigne(s)"))));
     ui->stackedWidget->setCurrentWidget(ui->P_changebox);
 
 }
@@ -239,6 +265,7 @@ void StowPackages::CreateListBoxTreeWidget()
 
         m_T_StatusDoors->setListBox(m_listBox);
         qDebug()<<"modification liste des portes";
+
         m_T_StatusDoors->start();
         qDebug()<<"demarrer thread";
     }
@@ -260,7 +287,7 @@ void StowPackages::StoragePackagesFinised()
     if(m_CustomTreeWidget->isDoorsClose(m_listBox))
     {
        m_T_StatusDoors->stopThread();
-
+       m_T_StatusDoors->wait(1000);
        for(int i = 0 ; i<m_listBox.size();i++)
        {
            if(m_listBox[i] != m_listPackageBox[i].BoxNumber)
@@ -287,16 +314,14 @@ void StowPackages::SaveBoxSelected()
     QList<int> listbox;
     int x;
     int y;
-    m_T_StatusDoors->stopThread();
-    m_T_StatusDoors->wait(10);
-    ui->treeWidget->clear();
-    m_CustomTreeWidget->ClearListItem();
+
 
     listbox = m_WBoxChoice->GetBoxSelected();
+
     qDebug()<<"listbox :"<<listbox;
     qDebug()<<"m_listbox :"<<m_listBox;
 
-    x=ui->B_Assistance->x()-ui->B_Assistance->width()-100;
+    x = ui->B_Assistance->x()-ui->B_Assistance->width()-100;
     y = ui->B_Assistance->y();
 
     if(listbox.isEmpty())
@@ -307,9 +332,13 @@ void StowPackages::SaveBoxSelected()
     }
     else{
 
+        m_T_StatusDoors->stopThread();
+        m_T_StatusDoors->wait(1000);
+        ui->treeWidget->clear();
+        m_CustomTreeWidget->ClearListItem();
+
         if(listbox.size() == m_listBox.size())
         {
-
 
             for(int i = 0; i < m_listBox.size();i++)
             {
@@ -329,6 +358,14 @@ void StowPackages::SaveBoxSelected()
         else{
              QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Vous n'avez pas le même nombre de consigne."),this);
         }
+    }
+}
+
+void StowPackages::UpdateBD()
+{
+    if(!m_listBoxdeftmp.isEmpty())
+    {
+           //m_BD->
     }
 }
 

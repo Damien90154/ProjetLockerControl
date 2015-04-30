@@ -10,7 +10,7 @@ CustomPushButton::CustomPushButton(int id, QString numpackage, QString file, QWi
     setIconSize(QSize(70,70));
     setFixedWidth(70);
 
-    setStyleSheet("QPushButton{position: right;background-color: rgb(255, 255, 255);color:black;};QPushButton:disable{ position: center;background-color:#F1F1F1;color:#787878;}");
+    setStyleSheet("QPushButton{position: right;background-color: rgb(255, 255, 255);color:black;font:15pt;};QPushButton:disable{ position: center;background-color:#F1F1F1;color:#787878;font:15pt;}");
 
 }
 
@@ -42,11 +42,11 @@ void CustomPushButton::setDisabledB(bool value)
     if(value)
     {
         setDisabled(value);
-        setStyleSheet("position: center;background-color:white;color:white;");
+        setStyleSheet("position: center;background-color:white;color:white;font:15pt;");
 
     }
     else{
-        setStyleSheet("position: center;background-color: rgb(231, 231, 231);color:black;");
+        setStyleSheet("position: center;background-color: rgb(231, 231, 231);color:black;font:15pt;");
         setDisabled(value);
     }
 }

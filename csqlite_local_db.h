@@ -7,9 +7,14 @@
 #include <QSqlError>
 #include <QFile>
 #include "DataStructures.h"
+#include <QObject>
+#include <QGraphicsItem>
 
-class CSQLite_Local_DB
+
+class CSQLite_Local_DB : public QObject
 {
+    Q_OBJECT
+
     private:
         QSqlDatabase m_DataBase;
         QString m_DatabaseName;
@@ -26,7 +31,7 @@ class CSQLite_Local_DB
         bool LoadDatabaseSave(QString FilePath);
 
     public:
-        CSQLite_Local_DB();
+        explicit CSQLite_Local_DB();
         ~CSQLite_Local_DB();
 
         QList<QString> DataBaseStatus();
@@ -47,6 +52,9 @@ class CSQLite_Local_DB
         bool SQL_Database_Manager(int Option);
         QList<int> GetFreeBoxes();
         bool SendQueryDoorsIsClosed(QString Query);
+
+    signals:
+        void SQL_Database_Manager_Status(QString Message,int Value);
 
 };
 

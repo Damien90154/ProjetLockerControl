@@ -41,7 +41,7 @@ private:
     MenuDelivery *m_WMenuDelivery;
     QList<int> m_ListBoxEmpty;
 
-    CustomTreeWidget *m_CustomTreeWidget;
+    CustomTreeWidget *m_CustomTreeWidget ;
 
     //CDOORS
     Thread_StatusDoors *m_T_StatusDoors;

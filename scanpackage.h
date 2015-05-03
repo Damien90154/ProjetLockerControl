@@ -18,16 +18,16 @@ class ScanPackage : public QWidget
 
 public:
     explicit ScanPackage(BoxChoice *,QWidget *parent = 0);
+    ~ScanPackage();
     void SetShowWidgets(ShowWidgets *TShowWidgets){m_ShowWidgets = TShowWidgets;}
     bool isNumBoxExist(int numbox);
     int  getIndexListNumBoxExist(int numbox);
     void AddItemListWidget(QString NumPackage);
     void Refresh();
     int BuildingListPackages(); //construction de la QList<struct_PackagesUseBox>
-
-    ~ScanPackage();
-
     void retranslateUi();
+    bool isExistNumPackage(QString NumPackage);
+
 public slots:
     void StockNumberPackage();//stock les n°colis dans une qlist
     void ValidateDelivery();//recuperation de la liste des colis et demande de confirmation

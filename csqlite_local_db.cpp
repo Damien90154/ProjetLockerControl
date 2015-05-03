@@ -11,20 +11,30 @@
 #include <QDebug>
 #include <QDateTime>
 
-CSQLite_Local_DB::CSQLite_Local_DB() : QObject()
+CSQLite_Local_DB::CSQLite_Local_DB(CLMS_DB *LMS_Server) : QObject()
 {
-    this->m_DatabaseName = "LC_SQL_files/LockerControlDatabase.sqlite";
-    this->m_SQL_File_DatabaseEmpty_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseEmpty.sql";
-    this->m_SQL_File_DatabaseDefault_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseDefault.sql";
-    this->m_SQL_File_DatabaseLastSave_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseLastSave.sql";
-
-    if(Connect_DB())
+    if(LMS_Server != NULL)
     {
-        this->m_DataBaseIsReady = true;  // Open database : Open
+        m_LMS_Server = LMS_Server;
+
+        this->m_DatabaseName = "LC_SQL_files/LockerControlDatabase.sqlite";
+        this->m_SQL_File_DatabaseEmpty_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseEmpty.sql";
+        this->m_SQL_File_DatabaseDefault_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseDefault.sql";
+        this->m_SQL_File_DatabaseLastSave_Path = "LC_SQL_files/LockerControl_SQL_File_DatabaseLastSave.sql";
+        this->m_SQL_File_DatabaseLastSave_Path_FromLMS = "LC_SQL_files/LockerControl_SQL_File_DatabaseLastSave_FromLMS.sql";
+
+        if(Connect_DB())
+        {
+            this->m_DataBaseIsReady = true;  // Open database : Open
+        }
+        else
+        {
+            this->m_DataBaseIsReady = false; // Open database : Fail
+        }
     }
     else
     {
-        this->m_DataBaseIsReady = false; // Open database : Fail
+        qDebug() << "[FATAL ERROR] : Uninitialized pointer : (CLMS_DB) = NULL !";
     }
 }
 
@@ -76,18 +86,16 @@ bool CSQLite_Local_DB::Connect_DB()
     return Result;
 }
 
-bool CSQLite_Local_DB::SendQuery(QString Query)
+QSqlQuery CSQLite_Local_DB::SendQuery(QString Query)
 {
     QSqlQuery query(this->m_DataBase);
-    bool Result = false;
 
     if(query.exec(Query))
     {
         SavePerfomAction("[WARNING] EXTERN CALL",Query);
-        Result = true;
     }
 
-    return Result;
+    return query;
 }
 
 QList<struct_DoorsStatus> CSQLite_Local_DB::SendQueryDoorsStatus(QString Query)
@@ -119,6 +127,21 @@ bool CSQLite_Local_DB::Delete_DB()
 
     // Remove created database file
     return QFile::remove(this->m_DatabaseName);
+}
+
+QString CSQLite_Local_DB::Get_SiteName()
+{
+    QSqlQuery query(this->m_DataBase);
+    QString SiteName;
+
+    if(query.exec("SELECT idConsole FROM Console"))
+    {
+        while(query.next())
+        {
+            SiteName = query.value(0).toString();
+        }
+    }
+    return SiteName;
 }
 
 QString CSQLite_Local_DB::lastError()
@@ -530,11 +553,12 @@ bool CSQLite_Local_DB::SQL_Database_Manager(int Option)
     QSqlQuery query(this->m_DataBase);
     QList<QString> QueryList;
 
-    emit SQL_Database_Manager_Status("Démarrage de SQL_Database_Manager ...",1);
     switch(Option)
     {
         case EMPTY_DATABASE:
         {
+            emit CurrentProcessLoading("Lancement du système de creation de base de données (empty) ...",12);
+            emit SlowProcess(2000);
             QueryList = ReadSQL_File(this->m_SQL_File_DatabaseEmpty_Path);
 
             for(int i=0; i<QueryList.count(); i++)
@@ -542,11 +566,18 @@ bool CSQLite_Local_DB::SQL_Database_Manager(int Option)
                 query.exec(QueryList[i]);
                 qDebug()<<"Query send : "<<QueryList[i];
             }
+            emit CurrentProcessLoading("Fin de creation de base de données (empty).",100);
+            emit SlowProcess(500);
             Result = true;
+            emit CurrentProcessLoading("END",101);
+            emit SlowProcess(5000);
+            emit CurrentProcessLoading("",0);
             break;
         }
         case DEFAULT_DATABASE:
         {
+            emit CurrentProcessLoading("Lancement du système de creation de base de données (Default) ...",12);
+            emit SlowProcess(2000);
             QueryList = ReadSQL_File(this->m_SQL_File_DatabaseDefault_Path);
 
             for(int i=0; i<QueryList.count(); i++)
@@ -554,20 +585,67 @@ bool CSQLite_Local_DB::SQL_Database_Manager(int Option)
                 query.exec(QueryList[i]);
                 qDebug()<<"Query send : "<<QueryList[i];
             }
+            emit CurrentProcessLoading("Fin de creation de base de données (Default).",100);
+            emit SlowProcess(500);
             Result = true;
+            emit CurrentProcessLoading("END",101);
+            emit SlowProcess(5000);
+            emit CurrentProcessLoading("",0);
             break;
         }
         case SAVE_DATABASE:
         {
-            emit SQL_Database_Manager_Status("Demarrage de la sauvegarde ...",2);
-            if(SaveDatabase(this->m_SQL_File_DatabaseLastSave_Path))
-                Result = true;
+            if(m_LMS_Server->ManualSave_DatabaseLMS(Get_SiteName(),m_SQL_File_DatabaseLastSave_Path) == false)
+            {
+                qDebug() << "[WARNING] : LMS Server is offline => build local database Save !";
+                emit CurrentProcessLoading("Lancement du système de sauvegarde ...",12);
+                emit SlowProcess(2000);
+                if(SaveDatabase(this->m_SQL_File_DatabaseLastSave_Path))
+                    Result = true;
+                emit CurrentProcessLoading("END",101);
+                emit SlowProcess(5000);
+                emit CurrentProcessLoading("",0);
+            }
+            else
+            {
+                qDebug() << "[SUCESS] : The local database save sended to the LMS Server !";
+            }
+
             break;
         }
         case LOAD_SAVE_DATABASE:
         {
-            if(LoadDatabaseSave(this->m_SQL_File_DatabaseLastSave_Path))
-                Result = true;
+            QFile SQL_File(m_SQL_File_DatabaseLastSave_Path_FromLMS);
+
+            QueryList = m_LMS_Server->Get_LastDatabase_Save(Get_SiteName());
+            if(QueryList.isEmpty())
+            {
+                qDebug() << "[WARNING] : LMS Server is offline => Read local database Save !";
+                emit CurrentProcessLoading("Lancement du système de chargement de sauvegardes ...",12);
+                emit SlowProcess(2000);
+                if(LoadDatabaseSave(this->m_SQL_File_DatabaseLastSave_Path))
+                    Result = true;
+                emit CurrentProcessLoading("END",101);
+                emit SlowProcess(5000);
+                emit CurrentProcessLoading("",0);
+            }
+            else  //Serveur LMS online => Read database save from LMS.
+            {
+                qDebug() << "[SUCESS] : Reading the database save from the LMS Server !";
+
+                if(SQL_File.open(QIODevice::WriteOnly)) //delete file
+                    qDebug() << "[WARNING] : The last database save From LMS Server : " << m_SQL_File_DatabaseLastSave_Path_FromLMS << " is DELETED !";
+                SQL_File.close();
+
+                for(int i=0; i<QueryList.count(); i++)
+                {
+                    WriteSQL_File(m_SQL_File_DatabaseLastSave_Path_FromLMS,QueryList[i]);
+                }
+
+                if(LoadDatabaseSave(m_SQL_File_DatabaseLastSave_Path_FromLMS))
+                    Result = true;
+            }
+
             break;
         }
         default:
@@ -603,23 +681,24 @@ bool CSQLite_Local_DB::SaveDatabase(QString FilePath)
         TablesList.append("User");
     }
 
-    emit SQL_Database_Manager_Status("Suppression de l'ancienne sauvegarde ...",3);
+    emit CurrentProcessLoading("Surppression du fichier de sauvegarde ...",15);
+    emit SlowProcess(500);
+
     if(SQL_File.open(QIODevice::WriteOnly)) //delete file
         qDebug() << "[WARNING] : The last database save : " << FilePath << " is DELETED !";
     SQL_File.close();
 
-    emit SQL_Database_Manager_Status("Création du fichier de sauvegarde ...",5);
     EmptyDatabaseQueryList = ReadSQL_File(m_SQL_File_DatabaseEmpty_Path);
     for(int i=0; i<EmptyDatabaseQueryList.count(); i++)
     {
         WriteSQL_File(FilePath,EmptyDatabaseQueryList[i]+"\n");
     }
 
-    emit SQL_Database_Manager_Status("Ecriture dans le fichier de sauvegarde ...",7);
     for(int Table=0; Table<TablesList.count(); Table++)
     {
-        emit SQL_Database_Manager_Status("Ecriture dans le fichier de sauvegarde ...",10+(Table*10));
-        qDebug()<< "TablesList :" << TablesList;
+        emit CurrentProcessLoading("Création du fichier de sauvegarde ...",10+((Table+1)*10));
+        emit SlowProcess(500);
+
         Database_Contains_Temp.Table = TablesList[Table];
         if(query.exec("SELECT * FROM " + TablesList[Table]))
         {
@@ -642,12 +721,13 @@ bool CSQLite_Local_DB::SaveDatabase(QString FilePath)
                 QueryValue.clear();
             }
         }
+
         Database_Contains.append(Database_Contains_Temp);
         Database_Contains_Temp.Values.clear();
         Result = true;
-        emit SQL_Database_Manager_Status("Fin de la sauvegarde ...",100);
     }
-
+    emit CurrentProcessLoading("Fichier de sauvegarde terminé ...",100);
+    emit SlowProcess(500);
     return Result;
 }
 
@@ -656,17 +736,20 @@ bool CSQLite_Local_DB::LoadDatabaseSave(QString FilePath)
     bool Result;
     QFile SQL_File(FilePath);
     QList<QString> QueryList;
-    QString Database_Path;
 
-    Database_Path = "rm "+this->m_DatabaseName;
+    emit CurrentProcessLoading("Fermeture de la base de données ...",20);
+    emit SlowProcess(500);
+
     this->m_DataBaseIsReady = false;
     this->m_DataBase.close();
 
-    if(system(Database_Path.toStdString().c_str())) //delete database
+    if(Delete_DB()) //delete database
     {
         qDebug()<< "[WARNING] : The database : " << this->m_DatabaseName << " is DELETED ! a new database is created with the last save ..." ;
     }
 
+    emit CurrentProcessLoading("Connexion sur la nouvelle de la base de données ...",40);
+    emit SlowProcess(500);
     if(Connect_DB())
     {
         this->m_DataBaseIsReady = true;  // Open database : Open
@@ -680,12 +763,15 @@ bool CSQLite_Local_DB::LoadDatabaseSave(QString FilePath)
 
     if(SQL_File.exists())
     {
+        emit CurrentProcessLoading("Ecriture des valeurs sauvegardées ...",70);
         Result = true;
         QueryList = ReadSQL_File(FilePath);
         for(int i=0; i<QueryList.count(); i++)
         {
             query.exec(QueryList[i]);
         }
+        emit CurrentProcessLoading("Fin du chargement de la sauvegarde.",100);
+        emit SlowProcess(500);
     }
     else
     {
@@ -713,3 +799,141 @@ bool CSQLite_Local_DB::SendQueryDoorsIsClosed(QString Query)
     return Result;
 }
 
+bool CSQLite_Local_DB::SetDammagedBoxes(QList<int> DammagedBoxes)
+{
+    bool Result = false;
+    QSqlQuery query(this->m_DataBase);
+
+    for(int i=0; i<DammagedBoxes.count(); i++)
+    {
+        if(query.exec("UPDATE Box SET BoxIsUsed='true' WHERE idBox='"+QString::number(DammagedBoxes[i],10)+"';"))
+        {
+            Result = true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return Result;
+}
+
+bool CSQLite_Local_DB::UnsetDammagedBoxes(QList<int> FixedBoxes)
+{
+    bool Result = false;
+    QSqlQuery query(this->m_DataBase);
+
+    for(int i=0; i<FixedBoxes.count(); i++)
+    {
+        if(query.exec("UPDATE Box SET BoxIsUsed='false' WHERE idBox='"+QString::number(FixedBoxes[i],10)+"'"))
+        {
+            Result = true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return Result;
+}
+
+QList<int> CSQLite_Local_DB::GetDammagedBoxes()
+{
+    QList<int> DammagedBoxes;
+    int IdBoxTemp;
+    QSqlQuery query(this->m_DataBase);
+
+    if(query.exec("SELECT idBox FROM Box WHERE BoxIsUsed='true'"))
+    {
+        while (query.next())
+        {
+            IdBoxTemp = query.value(0).toInt();
+            DammagedBoxes.append(IdBoxTemp);
+            if(query.exec("SELECT DoorLocker_LockState FROM DoorLocker WHERE Linked_idDoor='true'"))
+            {
+                while (query.next())
+                {
+                    DammagedBoxes.removeOne(query.value(0).toInt());
+                }
+            }
+        }
+    }
+
+    return DammagedBoxes;
+}
+
+bool CSQLite_Local_DB::DataBase_AutoSave_Needed()
+{
+    bool Result = false;
+
+    if(m_LMS_Server->AutoSave_DatabaseLMS(Get_SiteName(),m_SQL_File_DatabaseLastSave_Path) == false)
+    {
+        QStringList TablesList;
+        QList<QString> EmptyDatabaseQueryList;
+        QList<struct struct_Database_Contains> Database_Contains;
+        struct struct_Database_Contains Database_Contains_Temp;
+        QSqlQuery query(this->m_DataBase);
+        QFile SQL_File(m_SQL_File_DatabaseLastSave_Path);
+
+        TablesList = this->m_DataBase.tables();
+        if(TablesList.isEmpty())
+        {
+            TablesList.append("Box");
+            TablesList.append("Console");
+            TablesList.append("DCB_Controler");
+            TablesList.append("DoorLocker");
+            TablesList.append("ExtractCode");
+            TablesList.append("Package");
+            TablesList.append("PerformedActions");
+            TablesList.append("User");
+        }
+
+        if(SQL_File.open(QIODevice::WriteOnly)) //delete file
+            qDebug() << "[WARNING] : The last database save : " << m_SQL_File_DatabaseLastSave_Path << " is DELETED !";
+        SQL_File.close();
+
+        EmptyDatabaseQueryList = ReadSQL_File(m_SQL_File_DatabaseEmpty_Path);
+        for(int i=0; i<EmptyDatabaseQueryList.count(); i++)
+        {
+            WriteSQL_File(m_SQL_File_DatabaseLastSave_Path,EmptyDatabaseQueryList[i]+"\n");
+        }
+
+        for(int Table=0; Table<TablesList.count(); Table++)
+        {
+            Database_Contains_Temp.Table = TablesList[Table];
+            if(query.exec("SELECT * FROM " + TablesList[Table]))
+            {
+                qDebug()<<"SaveDatabase : SELECT ALL" << TablesList[Table];
+                while(query.next())
+                {
+                    QString QueryValue;
+
+                    for(int Col=0; Col<=7; Col++)
+                    {
+                        if(query.value(Col).toString() != "")
+                        {
+                            QueryValue += "'"+query.value(Col).toString()+"'" + ",";
+
+                            Database_Contains_Temp.Values.append(QueryValue);
+                        }
+                    }
+                    QueryValue.replace(QueryValue.size()-1,sizeof(QChar)," ");
+                    WriteSQL_File(m_SQL_File_DatabaseLastSave_Path,"INSERT INTO "+TablesList[Table]+" VALUES("+QueryValue+");\n");
+                    QueryValue.clear();
+                }
+            }
+
+            Database_Contains.append(Database_Contains_Temp);
+            Database_Contains_Temp.Values.clear();
+            Result = true;
+        }
+    }
+    else
+    {
+        qDebug() << "[SUCCESS] : Last database save sended to the LMS Server !";
+    }
+
+    return Result;
+}

@@ -60,9 +60,9 @@ void OpenEmptyBox::ReturnMenuDelivery()
         //message porte non ferme
         int x;
         int y;
-        x=ui->B_Assistance->x()+ui->B_Assistance->width()+10;
-        y = ui->B_Assistance->y();
-        QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Les portes ne sont pas fermées."),this);
+        x = mapToGlobal(ui->B_Assistance->pos()).x()+ui->B_Assistance->width()+10;
+        y =  mapToGlobal(ui->B_Assistance->pos()).y()-10;
+        QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Les portes ne sont pas ferm&eacute;es."),this);
     }
 
 
@@ -100,8 +100,8 @@ void OpenEmptyBox::CreateListBoxEmpty()
         //message aucune consigne est vide
         int x;
         int y;
-        x=ui->B_Assistance->x()+ui->B_Assistance->width()+10;
-        y = ui->B_Assistance->y();
+        x = mapToGlobal(ui->B_Assistance->pos()).x()+ui->B_Assistance->width()+10;
+        y = mapToGlobal(ui->B_Assistance->pos()).y()-10;
         QToolTip::showText(QPoint(x,y),tr("Il n'y a pas de consigne vide."),this);
     }
 

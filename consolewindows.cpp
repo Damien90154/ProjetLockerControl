@@ -1,7 +1,7 @@
 #include "consolewindows.h"
 #include "ui_consolewindows.h"
 #include <QStringList>
-
+#include <QPropertyAnimation>
 #include <qdebug.h>
 
 ConsoleWindows::ConsoleWindows(QWidget *parent) :
@@ -9,30 +9,33 @@ ConsoleWindows::ConsoleWindows(QWidget *parent) :
     ui(new Ui::ConsoleWindows)
 {
     ui->setupUi(this);
-
-    //création de la base de donnée
-    m_BD = new CSQLite_Local_DB();
-    if(m_BD->Get_DataBaseIsReady())
-    {
-        m_BD->SQL_Database_Manager(DEFAULT_DATABASE);
-    }
-    else
-    {
-        close();
-    }
-    //CDoors
-    m_Doors = new CDoors(m_BD);
+    //eleve les bordures
+    //setWindowFlags(Qt::FramelessWindowHint);
+     m_compteur = 0;
 
     //serveur LMS
     m_LMS = new CLMS_DB();
 
-    m_compteur = 0;
+    //création de la base de donnée
+    m_BD = new CSQLite_Local_DB(m_LMS);
+    if(m_BD->Get_DataBaseIsReady())
+    {
+        m_BD->SQL_Database_Manager(DEFAULT_DATABASE);
+    }
+    else{
+
+        close();
+    }
+
+    //CDoors
+    m_Doors = new CDoors(m_BD);
+
 
     //initialisation des Widgets
-     Initialization_Widgets();
+    Initialization_Widgets();
 
     //partage des postions Widgets et du stackedwidget pour les autres classes
-     Init_Show_Widgets();
+    Init_Show_Widgets();
 
     //Creation timer
     m_timer = new QTimer(this);
@@ -117,6 +120,10 @@ void ConsoleWindows::Initialization_Widgets()
     m_Widget_Setting = new Setting();
     m_position_WSetting = ui->stackedWidget->addWidget(m_Widget_Setting);
 
+   //Widget SettingSystem
+    m_Widget_SettingSystem = new SettingSystem();
+    m_position_WSettingSystem = ui->stackedWidget->addWidget(m_Widget_SettingSystem);
+
    //Widget MaintenanceMenu
     m_Widget_MaintenanceMenu = new MaintenanceMenu();
     m_position_WMaintenanceMenu = ui->stackedWidget->addWidget(m_Widget_MaintenanceMenu);
@@ -124,6 +131,10 @@ void ConsoleWindows::Initialization_Widgets()
    //Widget SQLite_Local_DatabaseManager
     m_Widget_SQLite_Local_DatabaseManager = new SQLite_Local_DatabaseManager(m_Widget_Setting,m_BD);
     m_position_WSQLite_Local_DatabaseManager = ui->stackedWidget->addWidget(m_Widget_SQLite_Local_DatabaseManager);
+
+   //Widget DoorsManager
+    m_Widget_DoorsManager = new DoorsManager(m_Widget_Setting,m_BD,m_Doors ,m_Widget_BoxChoice);
+    m_position_WDoorsManager = ui->stackedWidget->addWidget(m_Widget_DoorsManager);
 
 }
 void ConsoleWindows::Init_Show_Widgets()
@@ -144,7 +155,7 @@ void ConsoleWindows::Init_Show_Widgets()
     m_WidgetsShow.SetStackedWidget(ui->stackedWidget);
     m_WidgetsShow.SetPosMaintenanceMenu(m_position_WMaintenanceMenu);
     m_WidgetsShow.SetPosSQLite_Local_DatabaseManager(m_position_WSQLite_Local_DatabaseManager);
-
+    m_WidgetsShow.SetPosSettingSystem(m_position_WSettingSystem);
 
     //Widget Customer
     m_Widget_Customer->SetShowWidgets(&m_WidgetsShow);
@@ -178,10 +189,12 @@ void ConsoleWindows::Init_Show_Widgets()
 
    //Widget Setting
     m_Widget_Setting->SetShowWidgets(&m_WidgetsShow);
+    m_Widget_SettingSystem->SetShowWidgets(&m_WidgetsShow);
 
    //Widget Maintenance
     m_Widget_MaintenanceMenu->SetShowWidgets(&m_WidgetsShow);
     m_Widget_SQLite_Local_DatabaseManager->SetShowWidgets(&m_WidgetsShow);
+    m_Widget_DoorsManager->SetShowWidgets(&m_WidgetsShow);
 
 
 }
@@ -189,7 +202,18 @@ void ConsoleWindows::Init_Show_Widgets()
 //affiche ihm Customer
 void ConsoleWindows::Show_WCustomer()
 {
+    //cache bouton livraison
     HideB_DeliveryMaintenance();
+
+   QPropertyAnimation *fondu ;
+    QRect pGeo(m_Widget_Customer->x(),m_Widget_Customer->y(),m_Widget_Customer->width(),m_Widget_Customer->height());
+
+    fondu = new QPropertyAnimation(m_Widget_Customer,"geometry");
+    fondu->setEasingCurve(QEasingCurve::InOutSine);
+    fondu->setDuration(500);
+    fondu->setStartValue(QRect(m_Widget_Customer->x()-1500,pGeo.y(),pGeo.width(),pGeo.height()));
+    fondu->setEndValue(pGeo);
+    fondu->start();
 
     ui->stackedWidget->setCurrentIndex(m_position_WCustomer);
 }

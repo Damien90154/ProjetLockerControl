@@ -241,7 +241,7 @@ void StowPackages::ValidCheckedboxdef()
     }
     int nbox;
     nbox = m_listBoxdeftmp.size() + m_listBoxtmp.size();
-    ui->label_selectionbox->setText(QString(QString(tr("Veuillez sélectionner ")) + QString::number(nbox) + QString(tr(" consigne(s)"))));
+    ui->label_selectionbox->setText(QString(QString(tr("Veuillez s&eacute;lectionner ").toUtf8()) + QString::number(nbox) + QString(tr(" consigne(s)").toUtf8())));
     ui->stackedWidget->setCurrentWidget(ui->P_changebox);
 
 }
@@ -301,9 +301,9 @@ void StowPackages::StoragePackagesFinised()
         //message alerte
         int x;
         int y;
-        x=ui->B_Assistance->x()+ui->B_Assistance->width()+10;
-        y = ui->B_Assistance->y();
-        QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Les portes ne sont pas fermées."),this);
+        x =  mapToGlobal(ui->B_Assistance->pos()).x()-ui->B_Assistance->width()-180;
+        y =  mapToGlobal(ui->B_Assistance->pos()).y()-10;
+        QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Les portes ne sont pas ferm&eacute;es."),this);
     }
 
 
@@ -321,14 +321,14 @@ void StowPackages::SaveBoxSelected()
     qDebug()<<"listbox :"<<listbox;
     qDebug()<<"m_listbox :"<<m_listBox;
 
-    x = ui->B_Assistance->x()-ui->B_Assistance->width()-100;
-    y = ui->B_Assistance->y();
+    x = mapToGlobal(ui->B_Assistance->pos()).x()-ui->B_Assistance->width()-180;
+    y =  mapToGlobal(ui->B_Assistance->pos()).y()-10;
 
     if(listbox.isEmpty())
     {
         //message erreur aucune consigne selectionné
 
-        QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Vous n'avez pas sélectionné de consigne."),this);
+        QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Vous n'avez pas s&eacute;lectionn&eacute; de consigne."),this);
     }
     else{
 
@@ -351,12 +351,12 @@ void StowPackages::SaveBoxSelected()
 
                 }
             }
-
+            UpdateBD();
             CreateListBoxTreeWidget();
             ShowStowP();
         }
         else{
-             QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Vous n'avez pas le même nombre de consigne."),this);
+             QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Vous n'avez pas le m&ecirc;me nombre de consigne."),this);
         }
     }
 }
@@ -365,7 +365,7 @@ void StowPackages::UpdateBD()
 {
     if(!m_listBoxdeftmp.isEmpty())
     {
-           //m_BD->
+           m_BD->SetDammagedBoxes(m_listBoxdeftmp);
     }
 }
 

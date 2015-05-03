@@ -43,3 +43,36 @@ QList<struct struct_PackagesUseBox> CLMS_DB::GenerateExtractCode(QList<struct st
     }
     return PackageStorageListEmpty;
 }
+
+QList<QString> CLMS_DB::Get_LastDatabase_Save(QString DB_Site)
+{
+    QList<QString> QueryList;
+    qDebug() << "[WARNING] : LMS Server offline, unable to get the database save for : " << DB_Site;
+    return QueryList; //QueryList is empty = LMS Server offline
+}
+
+bool CLMS_DB::AutoSave_DatabaseLMS(QString DB_Site, QString FilePath)
+{
+    /*
+     *
+     * Try to save the local database
+     * Try to send the local database save to the LMS server
+     *
+     */
+
+    qDebug() << "[WARNING] : LMS Server is currently offline. We can't build the database save for : " << DB_Site << ", with the file : " << FilePath;
+    return false; // LMS Server offline
+}
+
+bool CLMS_DB::ManualSave_DatabaseLMS(QString DB_Site, QString FilePath)
+{
+    /*
+     *
+     * Try to save the local database
+     * Try to send the local database save to the LMS server
+     *
+     */
+
+    qDebug() << "[WARNING] : LMS Server is currently offline. We can't build the database save for : " << DB_Site << ", with the file : " << FilePath;
+    return false; // LMS Server offline
+}

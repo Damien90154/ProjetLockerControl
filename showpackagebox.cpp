@@ -134,9 +134,9 @@ void ShowPackageBox::ReturnHome()
         //signale porte ne son pas fermé
        int x;
        int y;
-       x=ui->B_Assistance->x()+ui->B_Assistance->width()+10;
-       y = ui->B_Assistance->y();
-       QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Les portes ne sont pas fermées."),this);
+       x = mapToGlobal(ui->B_Assistance->pos()).x()+ui->B_Assistance->width()+10;
+       y =  mapToGlobal(ui->B_Assistance->pos()).y()-10;
+       QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Les portes ne sont pas ferm&eacute;es."),this);
    }
 
 }

@@ -15,6 +15,7 @@
 #include "boxchoice.h"
 #include "deliveryconfirm.h"
 #include "setting.h"
+#include "settingsystem.h"
 #include "showwidgets.h"
 #include "showpackagebox.h"
 #include "stowpackages.h"
@@ -22,6 +23,7 @@
 #include "csqlite_local_db.h"
 #include "maintenancemenu.h"
 #include "sqlite_local_databasemanager.h"
+#include "doorsmanager.h"
 
 class ConsoleWindows;
 
@@ -70,6 +72,7 @@ private:
  //positions Widgets
     int m_position_WLogin;
     int m_position_WSetting;
+    int m_position_WSettingSystem;
     int m_position_WCustomer;
     int m_position_WConsole;
     int m_position_WMenuDelivery;
@@ -81,6 +84,7 @@ private:
     int m_position_WStowPackages;
     int m_position_WMaintenanceMenu;
     int m_position_WSQLite_Local_DatabaseManager;
+    int m_position_WDoorsManager;
 
     ShowWidgets m_WidgetsShow;
 
@@ -98,18 +102,23 @@ private:
 
  //Configuration systeme
     Setting *m_Widget_Setting;
+    SettingSystem *m_Widget_SettingSystem;
 
  //Maintenance
     MaintenanceMenu *m_Widget_MaintenanceMenu;
     SQLite_Local_DatabaseManager *m_Widget_SQLite_Local_DatabaseManager;
+    DoorsManager *m_Widget_DoorsManager;
+
  //Login
     Login *m_Widget_Login;
 
  //BD Local
     CSQLite_Local_DB *m_BD;
+
  //CDoors
     CDoors *m_Doors;
- //Serveur LMS
+
+    //Serveur LMS
     CLMS_DB *m_LMS;
 
  //Timer pour temps écoulée si pas d'action

@@ -75,25 +75,33 @@ void Login::BeforePage()
 bool Login::eventFilter(QObject *obj, QEvent *event)
 {
     bool result = false;
+    int x;
+    int y;
+
+    x = mapToGlobal(ui->B_Assistance->pos()).x()-ui->B_Assistance->width()-140;
+    y = mapToGlobal(ui->B_Assistance->pos()).y()-10;
 
     if(obj == ui->P_Societe && event->type() == QEvent::Show)
     {
        m_LineEdit_Selected = ED_SOCIETE;
-
+       if(obj == ui->P_Societe && event->type() == QEvent::KeyPress)
+       {
+        QToolTip::showText(QPoint(x,y),tr("Cliquez sur la fl&egrave;che &agrave; droite pour acc&eacute;der au champ :<br/> Identifiant Personnelle."),ui->B_Assistance);
+       }
        result = true;
     }
 
     if(obj == ui->P_ID && event->type() == QEvent::Show)
     {
        m_LineEdit_Selected = ED_ID;
-
+       QToolTip::showText(QPoint(x,y),tr("Cliquez sur la fl&egrave;che &agrave; droite pour acc&eacute;der au champ :<br/> Mot de Passe."),ui->B_Assistance);
        result = true;
     }
 
     if(obj == ui->P_Password && event->type() == QEvent::Show)
     {
        m_LineEdit_Selected = ED_PASSWD;
-
+       QToolTip::showText(QPoint(x,y),tr("Si vous avez &eacute;crit dans tous les champs<br/> Cliquez sur Connexion."),ui->B_Assistance);
        result = true;
     }
 
@@ -125,6 +133,9 @@ void Login::Cancel()
 void Login::ValidLogin()
 {
     int result;
+    int x;
+    int y;
+
     QString Societe;
     QString Id;
     QString Passwd;
@@ -142,10 +153,10 @@ void Login::ValidLogin()
 
         //authentification
         result = m_BD->Login(code);
-        int x;
-        int y;
-        x=ui->stackedWidget->width()/2;
-        y = ui->stackedWidget->height()/2;
+
+
+        x = mapToGlobal(ui->B_Assistance->pos()).x()-ui->B_Assistance->width()-230;
+        y = mapToGlobal(ui->B_Assistance->pos()).y()-10;
 
 
         switch (result) {
@@ -164,28 +175,27 @@ void Login::ValidLogin()
             case ERROR_ID:
                                 ui->Edit_personnel->setStyleSheet("background-color:white;color:red");
                                 ui->Edit_passwd->setStyleSheet("background-color:white;color:red");
-                                QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/>Votre Identifiant personnel et votre Mot de passe sont incorrect.<br/>Réessayer."),this);
+                                QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/>Votre Identifiant personnel et votre Mot de passe sont incorrect.<br/>R&eacute;essayer."),this);
                                 break;
 
             case ERROR_PASSWD:
                                 ui->Edit_passwd->setStyleSheet("background-color:white;color:red");
-                                QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/>Votre Mot de passe est incorrect.<br/>Réessayer."),this);
+                                QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/>Votre Mot de passe est incorrect.<br/>R&eacute;essayer."),this);
                                 break;
 
             default:            //si ERROR_LOGIN ou ERROR_COMPANY
                                 ui->Edit_societe->setStyleSheet("background-color:white;color:red");
                                 ui->Edit_personnel->setStyleSheet("background-color:white;color:red");
                                 ui->Edit_passwd->setStyleSheet("background-color:white;color:red");
-                                QToolTip::showText(QPoint(x,y),tr("Erreur de connexion!!!<br/>Vos Identifiants sont incorrect.<br/>Réessayer."),this);
+                                QToolTip::showText(QPoint(x,y),tr("Erreur de connexion!!!<br/>Vos Identifiants sont incorrect.<br/>R&eacute;essayer."),this);
                                 qDebug()<<"login incorrect";
                                 break;
         }
     }
     else{
-        int x;
-        int y;
-        x=ui->stackedWidget->width()/2;
-        y = ui->stackedWidget->height()/2;
+
+        x = mapToGlobal(ui->B_Assistance->pos()).x()-ui->B_Assistance->width()-150;
+        y = mapToGlobal(ui->B_Assistance->pos()).y()-10;
         QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/>Les champs sont vides."),this);
     }
 
@@ -209,6 +219,7 @@ void Login::SetCaract(QChar carac)
     ui->Edit_societe->setStyleSheet("background-color:white;color:black");
     ui->Edit_personnel->setStyleSheet("background-color:white;color:black");
     ui->Edit_passwd->setStyleSheet("background-color:white;color:black");
+
     switch(m_LineEdit_Selected)
     {
         case ED_SOCIETE:
@@ -228,7 +239,7 @@ void Login::SetCaract(QChar carac)
         default:
                         break;
 
-    };
+    }
 }
 
 void Login::SupprCaract()
@@ -260,6 +271,6 @@ void Login::SupprCaract()
                         break;
         default:
                         break;
-    };
+    }
 }
 

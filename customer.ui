@@ -229,6 +229,9 @@ QToolButton:pressed{
            <bold>true</bold>
           </font>
          </property>
+         <property name="toolTip">
+          <string>coucou</string>
+         </property>
          <property name="styleSheet">
           <string notr="true">QToolButton{
 background-color: rgb(255, 255, 255);
@@ -249,19 +252,14 @@ QToolButton:pressed{
     min-width:100px;
     min-height:100px;
 }
-QToolTip{
-	position:right-center;
+QToolTip{	
 	border:1px white;	
-	border-radius:0px;
-    min-width:450;
-	max-width:450;
+	border-radius:0px;  
 	font : 15pt;
-	min-height:150;
-	max-height:150;
-	background-color: rgb(114, 114, 114);
-	color: rgb(255, 255, 255);
-	    	
-}</string>
+	background-color: rgb(114, 144, 144);
+	color: rgb(255, 255, 255);	    	
+}
+</string>
          </property>
          <property name="text">
           <string/>
@@ -284,6 +282,9 @@ QToolTip{
          </property>
          <property name="autoRaise">
           <bool>false</bool>
+         </property>
+         <property name="arrowType">
+          <enum>Qt::NoArrow</enum>
          </property>
         </widget>
        </item>

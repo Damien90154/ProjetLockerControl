@@ -59,8 +59,11 @@ void Customer::Upper(QString str)
 void Customer::Valid_Code()
 {
     int result;
+    int x;
+    int y;
     QString ExtractCode;
     m_listboxcustomer.clear();
+
     ExtractCode = ui->lineEdit->text();
 
     if(ExtractCode.compare("")!=0)
@@ -88,18 +91,18 @@ void Customer::Valid_Code()
           }
           else{
               //sinon code incorrecte
-              int x;
-              int y;
-              x=ui->B_Assistance->x()-350;
-              y = ui->B_Assistance->y();
-              QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/> Le code de retrait est incorrect.<br/> Veuillez réessayer."),this);
+
+              x = mapToGlobal(ui->B_Assistance->pos()).x()-ui->B_Assistance->width()-230;
+              y = mapToGlobal(ui->B_Assistance->pos()).y()-10;
+
+              QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/> Le code de retrait est incorrect.<br/> Veuillez r&eacute;essayer."),ui->B_Assistance);
           }
     }
     else{
-        QPoint pos;
-        pos.setX(ui->lineEdit->x() + 250);
-        pos.setY(ui->lineEdit->y() + 50);
-        QToolTip::showText(pos,tr("Erreur!!!,Vous n'avez rien tapez"),this);
+
+        x = mapToGlobal(ui->lineEdit->pos()).x()+ui->lineEdit->width()/4;
+        y = mapToGlobal(ui->lineEdit->pos()).y()-ui->lineEdit->height();
+        QToolTip::showText(QPoint(x,y),tr("Erreur!!!,Vous n'avez rien tapez"),ui->lineEdit);
 
     }
 

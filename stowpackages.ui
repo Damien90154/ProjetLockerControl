@@ -322,7 +322,7 @@ QToolButton:pressed{
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="P_StowPackage">
         <layout class="QGridLayout" name="gridLayout_2">
@@ -1215,7 +1215,8 @@ QListWidget::indicator{
 	right:-250px;
 	top:-28px;
 	
-}</string>
+}
+</string>
              </property>
              <property name="verticalScrollBarPolicy">
               <enum>Qt::ScrollBarAsNeeded</enum>

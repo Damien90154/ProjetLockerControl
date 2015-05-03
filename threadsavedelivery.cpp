@@ -27,7 +27,7 @@ void ThreadSaveDelivery::run()
     for(value = 13;value <=50; value++)
     {
         emit SetValueProgress(value);
-        msleep(200);
+        msleep(100);
     }
 
     //envoie la liste avec code retrait a  la BD Local
@@ -35,7 +35,7 @@ void ThreadSaveDelivery::run()
     for(value=50;value <=100; value++)
     {
         emit SetValueProgress(value);
-        msleep(200);
+        msleep(100);
     }
     finished();
     exit();

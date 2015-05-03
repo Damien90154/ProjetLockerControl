@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += sql
+QT       += xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -39,7 +40,11 @@ SOURCES += main.cpp\
     country.cpp \
     maintenancemenu.cpp \
     sqlite_local_databasemanager.cpp \
-    thread_databasemanager.cpp
+    thread_databasemanager.cpp \
+    doorsmanager.cpp \
+    thread_localdatabase_autosave.cpp \
+    settingsystem.cpp \
+    customxml.cpp
 
 HEADERS  += \
     boxchoice.h \
@@ -68,7 +73,11 @@ HEADERS  += \
     country.h \
     maintenancemenu.h \
     sqlite_local_databasemanager.h \
-    thread_databasemanager.h
+    thread_databasemanager.h \
+    doorsmanager.h \
+    thread_localdatabase_autosave.h \
+    settingsystem.h \
+    customxml.h
 
 FORMS    += \
     boxchoice.ui \
@@ -84,7 +93,9 @@ FORMS    += \
     consolewindows.ui \
     keyboard.ui \
     maintenancemenu.ui \
-    sqlite_local_databasemanager.ui
+    sqlite_local_databasemanager.ui \
+    doorsmanager.ui \
+    settingsystem.ui
 
 RESOURCES += \
     Src.qrc

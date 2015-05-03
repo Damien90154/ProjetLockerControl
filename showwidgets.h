@@ -15,6 +15,7 @@ class ShowWidgets
     //Positions Widgets
     int m_position_WLogin;
     int m_position_WSetting;
+    int m_position_WSettingSystem;
     int m_position_WCustomer;
     int m_position_WConsole;
     int m_position_WMenuDelivery;
@@ -42,6 +43,7 @@ class ShowWidgets
     int GetPosScanPackage(){return m_position_WScanPackage;}
     int GetPosShowPackageBox(){return m_position_WShowPackageBox;}
     int GetPosSetting(){return m_position_WSetting;}
+    int GetPosSettingSystem(){return m_position_WSettingSystem;}
     int GetPosStowPackages(){return m_position_WStowPackages;}
     int GetPosMaintenanceMenu(){return m_position_WMaintenanceMenu;}
     int GetPosSQLite_Local_DatabaseManager(){return m_position_WSQLite_Local_DatabaseManager;}
@@ -62,6 +64,7 @@ class ShowWidgets
     void SetPosScanPackage(int TposScanPackage){m_position_WScanPackage = TposScanPackage;}
     void SetPosShowPackageBox(int TposShowPackageBox){m_position_WShowPackageBox = TposShowPackageBox;}
     void SetPosSetting(int TposSetting){m_position_WSetting = TposSetting;}
+    void SetPosSettingSystem(int TposSettingSystem){m_position_WSettingSystem = TposSettingSystem;}
     void SetPosStowPackages(int TposStowPackage){m_position_WStowPackages = TposStowPackage;}
     void SetPosMaintenanceMenu(int TposMaintenanceMenu){m_position_WMaintenanceMenu = TposMaintenanceMenu;}
     void SetPosSQLite_Local_DatabaseManager(int TposSQLite_Local_DatabaseManager) {m_position_WSQLite_Local_DatabaseManager = TposSQLite_Local_DatabaseManager;}
@@ -80,6 +83,7 @@ class ShowWidgets
     void ShowWStowPackages();
     void ShowWMaintenanceMenu();
     void ShowWSQLite_Local_DatabaseManager();
+    void ShowWSettingSystem();
 
 
 };

@@ -8,6 +8,7 @@ Setting::Setting(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->B_Home,SIGNAL(clicked()),this,SLOT(ReturnHome()));
     connect(ui->B_Maintenance,SIGNAL(clicked()),this,SLOT(ShowMaintenanceMenu()));
+    connect(ui->B_MenuConfig,SIGNAL(clicked()),this,SLOT(ShowSettingSystem()));
 }
 
 Setting::~Setting()
@@ -18,6 +19,11 @@ Setting::~Setting()
 void Setting::ShowMaintenanceMenu()
 {
     m_ShowWidgets->ShowWMaintenanceMenu();
+}
+
+void Setting::ShowSettingSystem()
+{
+    m_ShowWidgets->ShowWSettingSystem();
 }
 
 

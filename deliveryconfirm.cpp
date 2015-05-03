@@ -82,11 +82,11 @@ void DeliveryConfirm::SetValueProgress(int val)
 
     if(ui->progressBar->value() == 50)
     {
-        ui->label->setText(tr("Mise à jour de la Base de Donnée Local..."));
+        ui->label->setText(tr("Mise &agrave; jour de la Base de Donn&eacute;e Local..."));
     }
     if(ui->progressBar->value() == 100)
     {
-        ui->label->setText(tr("Mise à jour terminée"));
+        ui->label->setText(tr("Mise &agrave; jour termin&eacute;e"));
     }
 }
 

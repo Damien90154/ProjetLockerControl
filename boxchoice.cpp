@@ -65,9 +65,9 @@ void BoxChoice::ValidBox()
 
        int x;
        int y;
-       x=ui->B_Assistance->width()+30;
-       y = ui->B_Assistance->y();
-       QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Vous n'avez pas sélectionné de consigne."),ui->B_Assistance);
+       x = mapToGlobal(ui->B_Assistance->pos()).x()+ui->B_Assistance->width()+10;
+       y =  mapToGlobal(ui->B_Assistance->pos()).y()-10;
+       QToolTip::showText(QPoint(x,y),tr("Attention!!!<br/> Vous n'avez pas s&eacute;lectionn&eacute; de consigne."),ui->B_Assistance);
     }
     else{
         emit SendListBoxSelected(boxSelected);

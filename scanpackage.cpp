@@ -42,7 +42,7 @@ ScanPackage::ScanPackage(BoxChoice *WBoxChoice, QWidget *parent) :
     connect(this,SIGNAL(TextToUpper(QString)),ui->Edit_ncoli,SLOT(setText(QString)));
 
     ui->WKeyBoard->setVisible(true);
-    ui->WKeyBoard->setTextButtonOK(tr("Ajouter"));
+    ui->WKeyBoard->setTextButtonOK("Ajouter");
 
 
 }
@@ -134,11 +134,11 @@ void ScanPackage::ReceiveListBoxSelected(QList<int> listbox)
 
   if(m_ListBoxselected.size() > 1)
   {
-      ui->Label_BoxSelected->setText("Vous avez selectionné les consignes : \n" + box );
+      ui->Label_BoxSelected->setText("Vous avez selectionn&eacute; les consignes : \n" + box );
   }
   if(m_ListBoxselected.size() == 1)
   {
-      ui->Label_BoxSelected->setText("Vous avez selectionné la consigne : \n" + box );
+      ui->Label_BoxSelected->setText("Vous avez selectionn&eacute; la consigne : \n" + box );
   }
 
 
@@ -155,36 +155,61 @@ void ScanPackage::StockNumberPackage()
     ui->Edit_ncoli->clear();
 }
 
+bool ScanPackage::isExistNumPackage(QString NumPackage)
+{
+   bool result = false;
+
+   for(int i = 0;i<ui->ListPackages->count();i++)
+   {
+       if(ui->ListPackages->item(i)->text().compare(NumPackage) == 0)
+       {
+           result = true;
+       }
+   }
+
+   return result;
+}
+
 void ScanPackage::AddItemListWidget(QString NumPackage)
 {
-    QListWidgetItem *item;
-    CustomPushButton *Button_Suppr;
 
-    Button_Suppr = new CustomPushButton(m_idPushButton,NumPackage,":/ImgList/BSuppr");
-    qDebug()<<NumPackage;
-    item = new QListWidgetItem(NumPackage);
+    if(!isExistNumPackage(NumPackage))
+    {
+        QListWidgetItem *item;
+        CustomPushButton *Button_Suppr;
+
+        item = new QListWidgetItem(NumPackage);
+        Button_Suppr = new CustomPushButton(m_idPushButton,NumPackage,":/ImgList/BSuppr");
+        qDebug()<<NumPackage;
 
 
-    connect(Button_Suppr,SIGNAL(clicked(QString)),this,SLOT(DeleteNumPackage(QString)));
+        connect(Button_Suppr,SIGNAL(clicked(QString)),this,SLOT(DeleteNumPackage(QString)));
 
 
 
-    Button_Suppr->setGeometry(70,70,ui->ListPackages->width()/2,0);
-    QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight);
-    layout->addWidget(Button_Suppr,0,(Qt::AlignRight));
+        Button_Suppr->setGeometry(70,70,ui->ListPackages->width()/2,0);
+        QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight);
+        layout->addWidget(Button_Suppr,0,(Qt::AlignRight));
 
-    QWidget *widget = new QWidget();
-    widget->setLayout(layout);
-    widget->setStyleSheet("background:transparent;");
+        QWidget *widget = new QWidget();
+        widget->setLayout(layout);
+        widget->setStyleSheet("background:transparent;");
 
-    ui->ListPackages->addItem(item);
-    item->setTextAlignment(Qt::AlignVCenter);
-    ui->ListPackages->setItemWidget(item,widget);
+        ui->ListPackages->addItem(item);
+        item->setTextAlignment(Qt::AlignVCenter);
+        ui->ListPackages->setItemWidget(item,widget);
 
-    ui->ListPackages->setContentsMargins(5,5,5,5);
-    m_ListCustPusButton << Button_Suppr;
-    m_idPushButton++;
-
+        ui->ListPackages->setContentsMargins(5,5,5,5);
+        m_ListCustPusButton << Button_Suppr;
+        m_idPushButton++;
+    }
+    else{
+        int x;
+        int y;
+        x = mapToGlobal(ui->stackedWidget->pos()).x()+ui->stackedWidget->width()/2+10;
+        y = mapToGlobal(ui->stackedWidget->pos()).y()+20;
+        QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/> Le num&eacutero de colis a d&eacutej&agrave; s&eacutets&eacute saisi."),this);
+    }
 }
 
 //supprimer le numero de colis  dans la liste
@@ -200,9 +225,9 @@ void ScanPackage::DeleteNumPackage(QString package)
     }
 
     m_ListPackagesString.removeAt(index);
+
     QListWidgetItem *item;
     item = ui->ListPackages->takeItem(index);
-
     ui->ListPackages->removeItemWidget(item);
     m_ListCustPusButton.removeAt(index);
 
@@ -217,8 +242,9 @@ void ScanPackage::ValidateDelivery()
     int result;
     int x;
     int y;
-    x=ui->stackedWidget_2->width()/2-50;
-    y = ui->stackedWidget_2->height()/2;
+
+    x = mapToGlobal(ui->stackedWidget->pos()).x() + ui->stackedWidget->width()/2+10;
+    y = mapToGlobal(ui->stackedWidget->pos()).y() + 20;
 
     //CONSTRUCTION DE LA LISTE
     result = BuildingListPackages();
@@ -226,16 +252,19 @@ void ScanPackage::ValidateDelivery()
     switch (result) {
 
         case ERROR_BOXEMPTY:
-                            QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/> Une consigne n'est pas utilisé.<br>Veuillez saisir un numéro de coli ou annuler."),this);
+                            QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/> Une consigne n'est pas utilis&eacute;.<br>Veuillez saisir un num&eacute;ro de colis ou annuler."),this);
                             break;
 
         case ERROR_LISTEMPTY:
-                            QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/> Vous n'avez rien saisie."),this);
+                            QToolTip::showText(QPoint(x,y),tr("Erreur!!!<br/> Liste vide."),this);
                             break;
+        case OK :
+                 //affiche confirmation de la validation
+                 ui->stackedWidget->setCurrentIndex(2);
+                 break;
 
         default:
-                //affiche confirmation de la validation
-                ui->stackedWidget->setCurrentIndex(2);
+
                 break;
     }
 
@@ -266,6 +295,7 @@ int ScanPackage::BuildingListPackages()
     int result ;
     int sizeListPackages;
     int nbBox;
+
     nbBox = m_ListBoxselected.size();
     sizeListPackages = m_ListPackagesString.size();
     struct_PackagesUseBox tempPackage;
@@ -296,6 +326,7 @@ int ScanPackage::BuildingListPackages()
                     m_listPackageBox[0].BoxContainment.PackageDeliveryCodeList << m_ListPackagesString[i];
                 }
             }
+            result = OK;
         }
         else{
             result = ERROR_BOXEMPTY;

@@ -90,3 +90,8 @@ void ShowWidgets::ShowWSQLite_Local_DatabaseManager()
 {
     m_StackedWidget->setCurrentIndex(m_position_WSQLite_Local_DatabaseManager);
 }
+
+void ShowWidgets::ShowWSettingSystem()
+{
+    m_StackedWidget->setCurrentIndex(m_position_WSettingSystem);
+}

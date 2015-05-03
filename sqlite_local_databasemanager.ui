@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>802</width>
-    <height>483</height>
+    <width>828</width>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,13 +17,13 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>20</y>
-     <width>741</width>
-     <height>371</height>
+     <y>30</y>
+     <width>731</width>
+     <height>381</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="DB_Manager">
     <widget class="QWidget" name="layoutWidget_2">
@@ -36,7 +36,16 @@
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
        <number>5</number>
       </property>
       <item>
@@ -415,12 +424,12 @@ QToolButton:pressed{
       <rect>
        <x>30</x>
        <y>290</y>
-       <width>171</width>
+       <width>271</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Gestion des utilisateurs :</string>
+      <string>Gestion des utilisateurs : (non disponible)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -792,14 +801,67 @@ QProgressBar::chunk:horizontal {
     <widget class="QLabel" name="Label_ProgressBar">
      <property name="geometry">
       <rect>
-       <x>330</x>
-       <y>130</y>
-       <width>91</width>
+       <x>0</x>
+       <y>120</y>
+       <width>731</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Chargement ...</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="B_LoadingValid">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>260</y>
+       <width>99</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>OK</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="L_AutoReturnDB_Manager">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>330</y>
+       <width>311</width>
        <height>16</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
-      <string>Chargement</string>
+      <string>Retour automatique dans ... secondes</string>
      </property>
     </widget>
    </widget>

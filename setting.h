@@ -22,6 +22,8 @@ public slots:
     void ReturnHome();
     void ShowMaintenanceMenu();
 
+private slots:
+    void ShowSettingSystem();
 private:
     Ui::Setting *ui;
     ShowWidgets *m_ShowWidgets;
